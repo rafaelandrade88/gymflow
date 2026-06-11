@@ -2,7 +2,7 @@
   "name": "GymFlow",
   "short_name": "GymFlow",
   "description": "Seu app de treino na academia — fichas, séries, progresso e timer.",
-  "start_url": "/",
+  "start_url": "/gymflow/",
   "display": "standalone",
   "background_color": "#0a0a0f",
   "theme_color": "#0a0a0f",
@@ -34,6 +34,10 @@
       "description": "Iniciar treino rapidamente"
     }
   ],
-  "categories": ["health", "fitness", "sports"],
+  "categories": [
+    "health",
+    "fitness",
+    "sports"
+  ],
   "lang": "pt-BR"
 }
