@@ -3,6 +3,7 @@
   "short_name": "GymFlow",
   "description": "Seu app de treino na academia — fichas, séries, progresso e timer.",
   "start_url": "/gymflow/",
+  "scope": "/gymflow/",
   "display": "standalone",
   "background_color": "#0a0a0f",
   "theme_color": "#0a0a0f",
@@ -12,26 +13,19 @@
       "src": "icon-72.png",
       "sizes": "72x72",
       "type": "image/png",
-      "purpose": "maskable any"
+      "purpose": "any maskable"
     },
     {
       "src": "icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "maskable any"
+      "purpose": "any maskable"
     },
     {
       "src": "icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "maskable any"
-    }
-  ],
-  "shortcuts": [
-    {
-      "name": "Novo Treino",
-      "url": "/?action=start",
-      "description": "Iniciar treino rapidamente"
+      "purpose": "any maskable"
     }
   ],
   "categories": [
