@@ -5,6 +5,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <meta name="theme-color" content="#0a0a0f" />
+  <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="GymFlow" />
@@ -149,8 +150,10 @@
 
     .post-img {
       width: 100%;
-      aspect-ratio: 4/3;
-      object-fit: cover;
+      max-height: 480px;
+      min-height: 200px;
+      object-fit: contain;
+      object-position: center;
       display: block;
       background: var(--surface2);
     }
@@ -3564,7 +3567,6 @@
           formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
           formData.append('folder', 'gymflow/community');
           // Reduz qualidade para economizar bandwidth
-          formData.append('transformation', 'q_auto,f_auto,w_1080,c_limit');
 
           const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`, {
             method: 'POST',
