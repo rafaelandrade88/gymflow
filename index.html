@@ -2459,7 +2459,15 @@
         </svg>
         Histórico
       </button>
-      <button class="nav-item" id="nav-profile" onclick="App.navigate('profile')">
+      <button class="menu-btn" onclick="App.sideMenu.open()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <line x1="3" y1="6" x2="21" y2="6"/>
+          <line x1="3" y1="12" x2="21" y2="12"/>
+          <line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
+        Menu
+      </button>
+      <button class="nav-item" id="nav-profile" onclick="App.navigate('profile')" style="display:none">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
           <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
           <circle cx="12" cy="7" r="4" />
@@ -3950,6 +3958,25 @@
             .split('<').join('&lt;')
             .split('>').join('&gt;')
             .split('\n').join('<br>');
+        },
+
+        async toggleLike(postId) {
+          if (!uid()) return toast('Faça login para curtir.', 'error');
+          const postRef = refCommunity().doc(postId);
+          const post = App.community._posts.find(p => p.id === postId);
+          if (!post) return;
+          const likes = post.likes || [];
+          const myLike = likes.includes(uid());
+          try {
+            await postRef.update({
+              likes: myLike
+                ? firebase.firestore.FieldValue.arrayRemove(uid())
+                : firebase.firestore.FieldValue.arrayUnion(uid())
+            });
+          } catch(e) {
+            toast('Erro ao curtir. Tente novamente.', 'error');
+            console.error('[Like]', e);
+          }
         },
 
         toggleComments(postId) {
