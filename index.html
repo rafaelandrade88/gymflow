@@ -2436,8 +2436,8 @@
         // Validação de e-mail real: formato rigoroso + bloqueio de domínios descartáveis
         _validEmail(email) {
           // Formato: precisa ter @, domínio com ponto, TLD de ao menos 2 chars
-          const fmt = new RegExp("^[a-zA-Z0-9._%+\\-]+@[a-zA-Z0-9.\\-]+\\.[a-zA-Z]{2,}$");
-          if (!fmt.test(email)) return false;
+          const atIdx = email.indexOf("@"); const dotIdx = email.lastIndexOf("."); const valid = atIdx > 0 && dotIdx > atIdx + 1 && dotIdx < email.length - 2;
+          if (!valid) return false;
 
           const domain = email.split('@')[1].toLowerCase();
 
@@ -3586,8 +3586,11 @@
         },
 
         _escape(s) {
-          return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/
-            / g, '<br>');
+          return s
+            .split('&').join('&amp;')
+            .split('<').join('&lt;')
+            .split('>').join('&gt;')
+            .split('\n').join('<br>');
         }
       },
 
