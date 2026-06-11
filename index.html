@@ -2404,6 +2404,19 @@
           Sair
         </button>
       </div>
+      <!-- Version footer -->
+      <div style="
+        padding: 14px 20px calc(14px + var(--safe-bottom));
+        border-top: 1px solid var(--border);
+        display: flex; align-items: center; justify-content: space-between;
+      ">
+        <span style="font-size:12px; color:var(--text-dim)">GymFlow</span>
+        <span id="appVersionBadge" style="
+          font-size:11px; font-weight:600; color:var(--text-dim);
+          background:var(--surface2); border:1px solid var(--border);
+          border-radius:20px; padding:3px 10px; letter-spacing:0.3px;
+        ">v1.2.0</span>
+      </div>
     </div>
 
     <!-- UPDATE BANNER -->
@@ -2461,9 +2474,9 @@
       </button>
       <button class="menu-btn" onclick="App.sideMenu.open()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-          <line x1="3" y1="6" x2="21" y2="6"/>
-          <line x1="3" y1="12" x2="21" y2="12"/>
-          <line x1="3" y1="18" x2="21" y2="18"/>
+          <line x1="3" y1="6" x2="21" y2="6" />
+          <line x1="3" y1="12" x2="21" y2="12" />
+          <line x1="3" y1="18" x2="21" y2="18" />
         </svg>
         Menu
       </button>
@@ -2662,6 +2675,7 @@
     // CLOUDINARY CONFIG — substitua com suas credenciais
     // Crie conta gratuita em cloudinary.com
     // ============================================================
+    const APP_VERSION = '1.2.0'; // ← atualize a cada deploy
     const CLOUDINARY_CLOUD_NAME = 'dkfvnaw7y';   // ex: 'dxyz123'
     const CLOUDINARY_UPLOAD_PRESET = 'gymflow_posts';  // criar em Settings > Upload > Upload presets (unsigned)
 
@@ -3973,7 +3987,7 @@
                 ? firebase.firestore.FieldValue.arrayRemove(uid())
                 : firebase.firestore.FieldValue.arrayUnion(uid())
             });
-          } catch(e) {
+          } catch (e) {
             toast('Erro ao curtir. Tente novamente.', 'error');
             console.error('[Like]', e);
           }
@@ -4071,6 +4085,7 @@
         open() {
           const name = State.user?.displayName || 'Atleta';
           $('sideMenuUser').textContent = State.user?.email || '';
+          const badge = $('appVersionBadge'); if (badge) badge.textContent = 'v' + APP_VERSION;
           $('sideMenu').classList.add('open');
           $('sideMenuOverlay').classList.add('open');
         },
