@@ -735,6 +735,24 @@
     </div>
   </div>
 
+  <!-- UPDATE BANNER -->
+  <div id="updateBanner" style="
+    display:none; position:fixed; bottom:calc(var(--nav-h) + var(--safe-bottom) + 12px);
+    left:12px; right:12px; z-index:500;
+    background:var(--surface); border:1px solid var(--accent);
+    border-radius:var(--radius); padding:14px 16px;
+    align-items:center; gap:12px;
+    box-shadow: 0 4px 24px rgba(91,79,255,0.3);
+  ">
+    <span style="font-size:20px">🔄</span>
+    <div style="flex:1">
+      <div style="font-size:14px;font-weight:600">Nova versão disponível</div>
+      <div style="font-size:12px;color:var(--text-muted)">Toque em Atualizar para aplicar.</div>
+    </div>
+    <button onclick="App.update.apply()" class="btn btn-primary btn-sm">Atualizar</button>
+    <button onclick="App.update.dismiss()" class="btn btn-ghost btn-sm">Depois</button>
+  </div>
+
   <!-- NAV BAR -->
   <nav id="nav">
     <button class="nav-item active" id="nav-dashboard" onclick="App.navigate('dashboard')">
@@ -824,16 +842,14 @@
 </div>
 
 <script>
-// ============================================================
-// FIREBASE CONFIG — substitua com suas credenciais
-// ============================================================
+
 const FIREBASE_CONFIG = {
-  apiKey:            "YOUR_API_KEY",
-  authDomain:        "YOUR_AUTH_DOMAIN",
-  projectId:         "YOUR_PROJECT_ID",
-  storageBucket:     "YOUR_STORAGE_BUCKET",
-  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-  appId:             "YOUR_APP_ID"
+  apiKey: "AIzaSyAvOQBLpJQ4RFAMn5mWR_xy_W0xS509G2w",
+  authDomain: "gymflow-23d54.firebaseapp.com",
+  projectId: "gymflow-23d54",
+  storageBucket: "gymflow-23d54.firebasestorage.app",
+  messagingSenderId: "854180858506",
+  appId: "1:854180858506:web:e7fd1906d85bcaad90fb73"
 };
 
 // ============================================================
@@ -1771,6 +1787,29 @@ const App = {
       App.renderProfile();
       App.renderDashboard();
     }
+  },
+
+  // ----------------------------------------------------------
+  // UPDATE — Service Worker auto-update banner
+  // ----------------------------------------------------------
+  update: {
+    _newWorker: null,
+
+    apply() {
+      if (App.update._newWorker) {
+        App.update._newWorker.postMessage({ type: 'SKIP_WAITING' });
+      }
+      $('updateBanner').style.display = 'none';
+    },
+
+    dismiss() {
+      $('updateBanner').style.display = 'none';
+    },
+
+    show(worker) {
+      App.update._newWorker = worker;
+      $('updateBanner').style.display = 'flex';
+    }
   }
 };
 
@@ -1879,12 +1918,38 @@ auth.onAuthStateChanged(async user => {
 });
 
 // ============================================================
-// SERVICE WORKER
+// SERVICE WORKER — registro com detecção de atualização
 // ============================================================
 if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('sw.js')
-      .catch(err => console.warn('SW não registrado:', err));
+  window.addEventListener('load', async () => {
+    try {
+      const reg = await navigator.serviceWorker.register('sw.js');
+
+      // Verifica atualização a cada 60 segundos (útil quando o app fica aberto)
+      setInterval(() => reg.update(), 60_000);
+
+      // Novo SW encontrado aguardando — mostra banner
+      reg.addEventListener('updatefound', () => {
+        const newWorker = reg.installing;
+        newWorker.addEventListener('statechange', () => {
+          if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+            App.update.show(newWorker);
+          }
+        });
+      });
+
+      // Quando o SW tomar controle após SKIP_WAITING, recarrega a página
+      let refreshing = false;
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (!refreshing) {
+          refreshing = true;
+          window.location.reload();
+        }
+      });
+
+    } catch (err) {
+      console.warn('[SW] Registro falhou:', err);
+    }
   });
 }
 </script>

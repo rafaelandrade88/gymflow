@@ -1,54 +1,46 @@
 // ============================================================
-// GymFlow Service Worker — Offline First PWA
+// GymFlow Service Worker — Offline First + Auto Update
+// Incrementa CACHE_VERSION a cada deploy para forçar update
 // ============================================================
-const CACHE_NAME   = 'gymflow-v1';
-const STATIC_CACHE = 'gymflow-static-v1';
+const CACHE_VERSION = 'v2';
+const STATIC_CACHE = `gymflow-static-${CACHE_VERSION}`;
 
-// Assets que serão cacheados na instalação
 const STATIC_ASSETS = [
   '/',
   '/index.html'
 ];
 
-// ============================================================
-// INSTALL — pré-cache dos assets estáticos
-// ============================================================
 self.addEventListener('install', event => {
+  // Novo SW instala e já fica em standby (skipWaiting só após confirmação do usuário)
   event.waitUntil(
-    caches.open(STATIC_CACHE).then(cache => {
-      console.log('[SW] Pre-caching static assets');
-      return cache.addAll(STATIC_ASSETS);
-    }).then(() => self.skipWaiting())
+    caches.open(STATIC_CACHE).then(cache => cache.addAll(STATIC_ASSETS))
   );
+  // NÃO chama skipWaiting aqui — espera o usuário confirmar
 });
 
-// ============================================================
-// ACTIVATE — limpa caches antigos
-// ============================================================
 self.addEventListener('activate', event => {
-  const allowedCaches = [CACHE_NAME, STATIC_CACHE];
   event.waitUntil(
     caches.keys().then(keys =>
       Promise.all(
         keys
-          .filter(key => !allowedCaches.includes(key))
-          .map(key => {
-            console.log('[SW] Deleting old cache:', key);
-            return caches.delete(key);
-          })
+          .filter(key => key.startsWith('gymflow-') && key !== STATIC_CACHE)
+          .map(key => caches.delete(key))
       )
     ).then(() => self.clients.claim())
   );
 });
 
-// ============================================================
-// FETCH — Stale While Revalidate para assets locais
-//          Network first para Firebase (dados remotos)
-// ============================================================
+// Mensagem do app pedindo para aplicar update imediatamente
+self.addEventListener('message', event => {
+  if (event.data?.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
+});
+
 self.addEventListener('fetch', event => {
   const url = new URL(event.request.url);
 
-  // Deixa Firebase/Google APIs passarem direto (sem cache SW)
+  // Firebase e Google APIs — sempre network, nunca cache SW
   if (
     url.hostname.includes('firestore.googleapis.com') ||
     url.hostname.includes('identitytoolkit.googleapis.com') ||
@@ -57,11 +49,9 @@ self.addEventListener('fetch', event => {
     url.hostname.includes('gstatic.com') ||
     url.hostname.includes('fonts.googleapis.com') ||
     url.hostname.includes('fonts.gstatic.com')
-  ) {
-    return; // network-only para Firebase
-  }
+  ) return;
 
-  // Navegação (HTML) — network first com fallback para cache
+  // Navegação — network first, fallback cache
   if (event.request.mode === 'navigate') {
     event.respondWith(
       fetch(event.request)
@@ -75,13 +65,12 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  // Outros assets — cache first com revalidação em background
+  // Outros assets — cache first, revalida em background
   event.respondWith(
     caches.match(event.request).then(cached => {
       const network = fetch(event.request).then(response => {
         if (response.ok) {
-          const clone = response.clone();
-          caches.open(STATIC_CACHE).then(cache => cache.put(event.request, clone));
+          caches.open(STATIC_CACHE).then(cache => cache.put(event.request, response.clone()));
         }
         return response;
       }).catch(() => cached);
@@ -90,18 +79,13 @@ self.addEventListener('fetch', event => {
   );
 });
 
-// ============================================================
-// PUSH NOTIFICATIONS (estrutura base)
-// ============================================================
+// Push notifications
 self.addEventListener('push', event => {
   const data = event.data?.json() || { title: 'GymFlow', body: 'Hora do treino! 💪' };
   event.waitUntil(
     self.registration.showNotification(data.title, {
-      body:  data.body,
-      icon:  '/icon-192.png',
-      badge: '/icon-72.png',
-      vibrate: [200, 100, 200],
-      data:  { url: '/' }
+      body: data.body, icon: '/icon-192.png', badge: '/icon-72.png',
+      vibrate: [200, 100, 200], data: { url: '/' }
     })
   );
 });
