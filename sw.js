@@ -2,7 +2,7 @@
 // GymFlow Service Worker — Offline First + Auto Update
 // Incrementa CACHE_VERSION a cada deploy para forçar update
 // ============================================================
-const CACHE_VERSION = 'v1.1.2';
+const CACHE_VERSION = 'v1.3.0';
 const STATIC_CACHE = `gymflow-static-${CACHE_VERSION}`;
 
 const STATIC_ASSETS = [
