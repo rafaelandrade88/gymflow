@@ -15,9 +15,9 @@ self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(STATIC_CACHE)
       .then(cache => cache.addAll(STATIC_ASSETS))
-      .catch(() => { }) // não falha se algum asset não existir
+      .catch(() => { })
+      .then(() => self.skipWaiting()) // ← assume controle imediatamente
   );
-  // NÃO chama skipWaiting aqui — espera confirmação do usuário
 });
 
 self.addEventListener('activate', event => {
@@ -28,11 +28,10 @@ self.addEventListener('activate', event => {
           .filter(key => key.startsWith('gymflow-') && key !== STATIC_CACHE)
           .map(key => caches.delete(key))
       )
-    ).then(() => self.clients.claim())
+    ).then(() => self.clients.claim()) // ← toma conta de todas as abas abertas
   );
 });
 
-// Mensagem do app pedindo para aplicar update imediatamente
 self.addEventListener('message', event => {
   if (event.data && event.data.type === 'SKIP_WAITING') {
     self.skipWaiting();
@@ -42,7 +41,6 @@ self.addEventListener('message', event => {
 self.addEventListener('fetch', event => {
   const url = new URL(event.request.url);
 
-  // Firebase e Google APIs — sempre network, nunca cache SW
   if (
     url.hostname.includes('firestore.googleapis.com') ||
     url.hostname.includes('identitytoolkit.googleapis.com') ||
@@ -51,10 +49,10 @@ self.addEventListener('fetch', event => {
     url.hostname.includes('gstatic.com') ||
     url.hostname.includes('fonts.googleapis.com') ||
     url.hostname.includes('fonts.gstatic.com') ||
-    url.hostname.includes('cloudinary.com')
+    url.hostname.includes('cloudinary.com') ||
+    url.hostname.includes('anthropic.com')
   ) return;
 
-  // Navegação — network first, fallback cache
   if (event.request.mode === 'navigate') {
     event.respondWith(
       fetch(event.request)
@@ -64,14 +62,14 @@ self.addEventListener('fetch', event => {
             .then(cache => cache.put(event.request, clone));
           return response;
         })
-        .catch(() => caches.match('/gymflow/index.html')
-          .then(r => r || caches.match('/gymflow/'))
+        .catch(() =>
+          caches.match('/gymflow/index.html')
+            .then(r => r || caches.match('/gymflow/'))
         )
     );
     return;
   }
 
-  // Outros assets — cache first, revalida em background
   event.respondWith(
     caches.match(event.request).then(cached => {
       const network = fetch(event.request).then(response => {
@@ -86,7 +84,6 @@ self.addEventListener('fetch', event => {
   );
 });
 
-// Push notifications
 self.addEventListener('push', event => {
   const data = event.data
     ? event.data.json()
@@ -105,8 +102,8 @@ self.addEventListener('push', event => {
 self.addEventListener('notificationclick', event => {
   event.notification.close();
   event.waitUntil(
-    clients.openWindow(event.notification.data
-      ? event.notification.data.url
-      : '/gymflow/')
+    clients.openWindow(
+      event.notification.data ? event.notification.data.url : '/gymflow/'
+    )
   );
 });
