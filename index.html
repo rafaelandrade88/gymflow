@@ -2065,6 +2065,161 @@
       width: 15px;
       height: 15px;
     }
+
+    /* ── PDF Import ─────────────────────────────────────────── */
+    .pdf-upload-area {
+      border: 2px dashed var(--border);
+      border-radius: var(--radius);
+      padding: 32px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color var(--transition), background var(--transition);
+      background: var(--surface2);
+      margin-bottom: 16px;
+    }
+
+    .pdf-upload-area:hover {
+      border-color: var(--accent);
+      background: rgba(91, 79, 255, 0.05);
+    }
+
+    .pdf-upload-area.has-file {
+      border-color: var(--success);
+      background: rgba(46, 213, 115, 0.05);
+    }
+
+    .pdf-icon {
+      font-size: 40px;
+      margin-bottom: 10px;
+    }
+
+    .pdf-status {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 6px;
+    }
+
+    .pdf-preview-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-height: 320px;
+      overflow-y: auto;
+    }
+
+    .pdf-ficha-preview {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 12px 14px;
+    }
+
+    .pdf-ficha-name {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .pdf-ficha-exercises {
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    .ai-thinking {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px;
+      background: rgba(91, 79, 255, 0.08);
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--accent);
+      margin-bottom: 14px;
+      font-size: 13px;
+    }
+
+    .ai-spinner {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      border: 2px solid rgba(91, 79, 255, 0.3);
+      border-top-color: var(--accent);
+      animation: spin 0.7s linear infinite;
+      flex-shrink: 0;
+    }
+
+    /* ── Onboarding empty state ──────────────────────────────── */
+    .onboarding-empty {
+      text-align: center;
+      padding: 40px 20px;
+    }
+
+    .onboarding-icon {
+      font-size: 52px;
+      margin-bottom: 16px;
+    }
+
+    .onboarding-title {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .onboarding-sub {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-bottom: 28px;
+      line-height: 1.6;
+    }
+
+    .onboarding-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    /* ── Workout confirm modal ───────────────────────────────── */
+    .workout-confirm-exercises {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin: 16px 0;
+      max-height: 240px;
+      overflow-y: auto;
+    }
+
+    .workout-confirm-ex {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      background: var(--surface2);
+      border-radius: var(--radius-sm);
+    }
+
+    .workout-confirm-num {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: #fff;
+      font-size: 10px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .workout-confirm-name {
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .workout-confirm-meta {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
   </style>
 </head>
 
@@ -2244,10 +2399,22 @@
     <div id="screen-fichas" class="screen">
       <div class="section-header">
         <div class="section-title">Fichas de Treino</div>
-        <button class="btn btn-primary btn-sm" onclick="App.fichas.openModal()">+ Nova</button>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-secondary btn-sm" onclick="App.fichas.openPdfModal()">📄 PDF</button>
+          <button class="btn btn-primary btn-sm" onclick="App.fichas.openModal()">+ Nova</button>
+        </div>
       </div>
       <div class="ficha-list" id="fichaList">
-        <div class="text-muted text-center" style="padding:40px">Nenhuma ficha criada ainda.</div>
+        <div class="onboarding-empty" id="fichasOnboarding">
+          <div class="onboarding-icon">🏋️</div>
+          <div class="onboarding-title">Crie seu primeiro treino</div>
+          <div class="onboarding-sub">Monte suas fichas manualmente ou importe um PDF com seus treinos e a IA configura
+            tudo automaticamente.</div>
+          <div class="onboarding-actions">
+            <button class="btn btn-primary" onclick="App.fichas.openPdfModal()">📄 Importar PDF com IA</button>
+            <button class="btn btn-secondary" onclick="App.fichas.openModal()">✏️ Criar manualmente</button>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -2571,6 +2738,83 @@
         <button class="btn btn-secondary" onclick="App.community.closePostModal()">Cancelar</button>
         <button class="btn btn-primary" onclick="App.community.submitPost()">Publicar 🔥</button>
       </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Importar PDF com IA -->
+  <div class="modal-overlay" id="pdfImportModal">
+    <div class="modal" style="max-height:85vh">
+      <div class="modal-handle" onclick="App.fichas.closePdfModal()"></div>
+      <div class="modal-title">📄 Importar PDF com IA</div>
+      <p class="text-muted" style="margin-bottom:16px;line-height:1.6">
+        Envie o PDF com seus treinos. A IA vai extrair os exercícios e criar as fichas automaticamente.
+      </p>
+
+      <!-- Step 1: upload -->
+      <div id="pdfStep1">
+        <input type="file" id="pdfFileInput" accept="application/pdf" style="display:none"
+          onchange="App.fichas.pdfSelected(this)" />
+        <div class="pdf-upload-area" id="pdfUploadArea" onclick="$('pdfFileInput').click()">
+          <div class="pdf-icon">📎</div>
+          <div style="font-size:14px;font-weight:600">Toque para selecionar o PDF</div>
+          <div class="pdf-status" id="pdfStatus">Máximo 10MB</div>
+        </div>
+        <div class="row">
+          <button class="btn btn-secondary" onclick="App.fichas.closePdfModal()">Cancelar</button>
+          <button class="btn btn-primary" id="pdfAnalyzeBtn" disabled onclick="App.fichas.analyzePdf()">
+            ✨ Analisar com IA
+          </button>
+        </div>
+      </div>
+
+      <!-- Step 2: AI thinking -->
+      <div id="pdfStep2" style="display:none">
+        <div class="ai-thinking">
+          <div class="ai-spinner"></div>
+          <div>
+            <div style="font-weight:600">IA analisando seu PDF...</div>
+            <div style="color:var(--text-muted);font-size:12px">Extraindo exercícios e configurando fichas</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 3: preview fichas -->
+      <div id="pdfStep3" style="display:none">
+        <div style="font-size:13px;font-weight:600;color:var(--success);margin-bottom:12px">
+          ✅ Fichas extraídas com sucesso!
+        </div>
+        <div class="pdf-preview-list" id="pdfPreviewList"></div>
+        <div class="row mt-16">
+          <button class="btn btn-secondary" onclick="App.fichas.pdfReset()">← Voltar</button>
+          <button class="btn btn-lime" onclick="App.fichas.pdfImportConfirm()">💾 Salvar fichas</button>
+        </div>
+      </div>
+
+      <!-- Step error -->
+      <div id="pdfStepError" style="display:none">
+        <div
+          style="background:rgba(255,71,87,0.1);border:1px solid var(--danger);border-radius:var(--radius-sm);padding:14px;margin-bottom:16px">
+          <div style="font-size:13px;font-weight:600;color:var(--danger);margin-bottom:4px">Erro ao analisar PDF</div>
+          <div class="pdf-status" id="pdfErrorMsg">Tente novamente com outro arquivo.</div>
+        </div>
+        <div class="row">
+          <button class="btn btn-secondary" onclick="App.fichas.pdfReset()">← Tentar novamente</button>
+          <button class="btn btn-ghost" onclick="App.fichas.closePdfModal()">Fechar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Confirmar iniciar treino -->
+  <div class="modal-overlay" id="workoutConfirmModal">
+    <div class="modal">
+      <div class="modal-handle" onclick="App.modal.close('workoutConfirmModal')"></div>
+      <div class="modal-title" id="workoutConfirmTitle">💪 Treino A</div>
+      <div class="text-muted" style="font-size:13px">Confira os exercícios de hoje:</div>
+      <div class="workout-confirm-exercises" id="workoutConfirmExercises"></div>
+      <button class="btn btn-lime" style="width:100%" onclick="App.workout.confirmStart()">▶ Iniciar Treino</button>
+      <button class="btn btn-ghost mt-8" style="width:100%"
+        onclick="App.modal.close('workoutConfirmModal')">Cancelar</button>
     </div>
   </div>
 
@@ -3221,6 +3465,188 @@
           })).filter(ex => ex.name);
         },
 
+        // ── PDF IMPORT WITH AI ───────────────────────────────────
+        _pdfFile: null,
+        _pdfFichas: [],
+
+        openPdfModal() {
+          App.fichas.pdfReset();
+          App.modal.open('pdfImportModal');
+        },
+
+        closePdfModal() {
+          App.modal.close('pdfImportModal');
+          App.fichas.pdfReset();
+        },
+
+        pdfReset() {
+          App.fichas._pdfFile = null;
+          App.fichas._pdfFichas = [];
+          $('pdfStep1').style.display = 'block';
+          $('pdfStep2').style.display = 'none';
+          $('pdfStep3').style.display = 'none';
+          $('pdfStepError').style.display = 'none';
+          $('pdfUploadArea').classList.remove('has-file');
+          $('pdfStatus').textContent = 'Máximo 10MB';
+          $('pdfAnalyzeBtn').disabled = true;
+          $('pdfFileInput').value = '';
+        },
+
+        pdfSelected(input) {
+          const file = input.files[0];
+          if (!file) return;
+          if (file.size > 10 * 1024 * 1024) {
+            return toast('PDF muito grande. Máximo 10MB.', 'error');
+          }
+          if (file.type !== 'application/pdf') {
+            return toast('Selecione um arquivo PDF.', 'error');
+          }
+          App.fichas._pdfFile = file;
+          $('pdfUploadArea').classList.add('has-file');
+          $('pdfStatus').textContent = '✅ ' + file.name + ' (' + (file.size / 1024).toFixed(0) + 'KB)';
+          $('pdfAnalyzeBtn').disabled = false;
+        },
+
+        async analyzePdf() {
+          if (!App.fichas._pdfFile) return;
+
+          // Show step 2 (thinking)
+          $('pdfStep1').style.display = 'none';
+          $('pdfStep2').style.display = 'block';
+
+          try {
+            // Convert PDF to base64
+            const base64 = await new Promise((res, rej) => {
+              const reader = new FileReader();
+              reader.onload = () => res(reader.result.split(',')[1]);
+              reader.onerror = () => rej(new Error('Erro ao ler arquivo'));
+              reader.readAsDataURL(App.fichas._pdfFile);
+            });
+
+            // Call Claude API
+            const response = await fetch('https://api.anthropic.com/v1/messages', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                model: 'claude-sonnet-4-6',
+                max_tokens: 4096,
+                messages: [{
+                  role: 'user',
+                  content: [
+                    {
+                      type: 'document',
+                      source: { type: 'base64', media_type: 'application/pdf', data: base64 }
+                    },
+                    {
+                      type: 'text',
+                      text: `Analise este PDF de treinos de academia e extraia as fichas de treino.
+Retorne SOMENTE um JSON válido, sem texto extra, sem markdown, sem blocos de código.
+Formato exato:
+{
+  "fichas": [
+    {
+      "name": "Treino A — Peito e Bíceps",
+      "emoji": "💪",
+      "exercises": [
+        {
+          "name": "Supino Inclinado",
+          "group": "Peito",
+          "sets": 3,
+          "reps": "8-12",
+          "weight": 0,
+          "obs": "Observações opcionais"
+        }
+      ]
+    }
+  ]
+}
+Grupos musculares válidos: Peito, Costas, Ombro, Bíceps, Tríceps, Perna, Glúteo, Abdômen, Cardio, Outro.
+Para o emoji escolha um adequado ao grupo principal da ficha: 💪🏋️🦵⚡🔥🤸
+Extraia TODOS os treinos e exercícios encontrados no PDF.`
+                    }
+                  ]
+                }]
+              })
+            });
+
+            if (!response.ok) {
+              const err = await response.json();
+              throw new Error(err.error?.message || 'Erro na API: ' + response.status);
+            }
+
+            const data = await response.json();
+            const rawText = data.content.filter(b => b.type === 'text').map(b => b.text).join('');
+
+            // Parse JSON — strip any accidental markdown
+            const clean = rawText.replace(/```json|```/g, '').trim();
+            const parsed = JSON.parse(clean);
+
+            if (!parsed.fichas || !Array.isArray(parsed.fichas) || parsed.fichas.length === 0) {
+              throw new Error('Nenhuma ficha encontrada no PDF.');
+            }
+
+            App.fichas._pdfFichas = parsed.fichas;
+
+            // Show step 3 (preview)
+            $('pdfStep2').style.display = 'none';
+            $('pdfStep3').style.display = 'block';
+
+            const previewList = $('pdfPreviewList');
+            previewList.innerHTML = '';
+            parsed.fichas.forEach(f => {
+              const el = document.createElement('div');
+              el.className = 'pdf-ficha-preview';
+              el.innerHTML = '<div class="pdf-ficha-name">' + (f.emoji || '🏋️') + ' ' + f.name + '</div>'
+                + '<div class="pdf-ficha-exercises">'
+                + (f.exercises || []).map((ex, i) => (i + 1) + '. ' + ex.name + ' — ' + ex.sets + '×' + ex.reps).join('<br>')
+                + '</div>';
+              previewList.appendChild(el);
+            });
+
+          } catch (e) {
+            console.error('[PDF Import]', e);
+            $('pdfStep2').style.display = 'none';
+            $('pdfStepError').style.display = 'block';
+            $('pdfErrorMsg').textContent = e.message || 'Erro inesperado. Tente novamente.';
+          }
+        },
+
+        async pdfImportConfirm() {
+          const fichas = App.fichas._pdfFichas;
+          if (!fichas || fichas.length === 0) return;
+
+          try {
+            const batch = db.batch();
+            const now = firebase.firestore.FieldValue.serverTimestamp();
+            fichas.forEach(f => {
+              const ref = refFichas().doc();
+              batch.set(ref, {
+                name: f.name || 'Treino',
+                emoji: f.emoji || '🏋️',
+                exercises: (f.exercises || []).map(ex => ({
+                  name: ex.name || '',
+                  group: ex.group || 'Outro',
+                  sets: parseInt(ex.sets) || 3,
+                  reps: String(ex.reps || '10'),
+                  weight: parseFloat(ex.weight) || 0,
+                  obs: ex.obs || ''
+                })),
+                createdAt: now,
+                updatedAt: now
+              });
+            });
+            await batch.commit();
+
+            toast(fichas.length + ' ficha(s) importada(s) com sucesso! 🎉', 'success');
+            App.fichas.closePdfModal();
+            await App.loadFichas();
+            App.renderDashboard();
+          } catch (e) {
+            toast('Erro ao salvar fichas.', 'error');
+            console.error('[PDF Import Save]', e);
+          }
+        },
+
         async save() {
           const name = $('fichaName').value.trim();
           if (!name) return toast('Informe o nome da ficha.', 'error');
@@ -3258,11 +3684,37 @@
       // WORKOUT (TREINO ATIVO)
       // ----------------------------------------------------------
       workout: {
+        // Show confirmation modal before starting
         start(fichaId) {
           const ficha = State.fichas.find(f => f.id === fichaId);
           if (!ficha) return toast('Ficha não encontrada.', 'error');
 
-          // Build active workout state
+          // Store pending ficha
+          State.pendingFichaId = fichaId;
+
+          // Populate confirm modal
+          $('workoutConfirmTitle').textContent = (ficha.emoji || '💪') + ' ' + ficha.name;
+          const exList = $('workoutConfirmExercises');
+          exList.innerHTML = '';
+          (ficha.exercises || []).forEach((ex, i) => {
+            const el = document.createElement('div');
+            el.className = 'workout-confirm-ex';
+            el.innerHTML = '<div class="workout-confirm-num">' + (i + 1) + '</div>'
+              + '<div><div class="workout-confirm-name">' + ex.name + '</div>'
+              + '<div class="workout-confirm-meta">' + ex.sets + ' séries · ' + ex.reps + ' reps'
+              + (ex.weight ? ' · ' + ex.weight + 'kg' : '') + '</div></div>';
+            exList.appendChild(el);
+          });
+          App.modal.open('workoutConfirmModal');
+        },
+
+        // Called when user taps "Iniciar Treino" in confirm modal
+        confirmStart() {
+          App.modal.close('workoutConfirmModal');
+          const fichaId = State.pendingFichaId;
+          const ficha = State.fichas.find(f => f.id === fichaId);
+          if (!ficha) return toast('Ficha não encontrada.', 'error');
+
           State.activeWorkout = {
             fichaId,
             fichaName: ficha.name,
@@ -3283,7 +3735,6 @@
           App.workout.render();
           App.navigate('workout');
 
-          // Start elapsed timer
           clearInterval(State.workoutTimer);
           State.workoutTimer = setInterval(() => {
             const el = $('workoutElapsed');
