@@ -4230,7 +4230,7 @@ Extraia TODOS os treinos e exercícios encontrados no PDF.`
             let workoutHtml = '';
             if (post.workout) {
               workoutHtml = '<div class="post-workout-summary">'
-                + '<div class="post-workout-name">' + (post.workout.fichaEmoji || '&#127947;') + ' ' + post.workout.fichaName + '</div>'
+                + '<div class="post-workout-name">' + App.community._escape(post.workout.fichaEmoji || '🏋️') + ' ' + App.community._escape(post.workout.fichaName || '') + '</div>'
                 + '<div class="post-workout-stats">'
                 + '<div class="post-workout-stat"><strong>' + post.workout.duration + '</strong> dur.</div>'
                 + '<div class="post-workout-stat"><strong>' + post.workout.series + '</strong> s&#233;ries</div>'
@@ -4257,7 +4257,7 @@ Extraia TODOS os treinos e exercícios encontrados no PDF.`
             el.innerHTML =
               '<div class="post-header">'
               + '<div class="post-avatar">' + initial + '</div>'
-              + '<div style="flex:1"><div class="post-user-name">' + (post.userName || 'Atleta') + '</div>'
+              + '<div style="flex:1"><div class="post-user-name">' + App.community._escape(post.userName || 'Atleta') + '</div>'
               + '<div class="post-time">' + timeAgo + '</div></div>'
               + delBtn + '</div>'
               + imgHtml
@@ -4479,7 +4479,7 @@ Extraia TODOS os treinos e exercícios encontrados no PDF.`
               item.innerHTML = `
                 <div class="comment-avatar">${initial}</div>
                 <div class="comment-body">
-                  <div class="comment-author">${c.userName || 'Atleta'}</div>
+                  <div class="comment-author">${App.community._escape(c.userName || 'Atleta')}</div>
                   <div class="comment-text">${App.community._escape(c.text || '')}</div>
                   <div class="comment-time">${App.community._timeAgo(c.createdAt)}</div>
                 </div>
