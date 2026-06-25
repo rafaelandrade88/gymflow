@@ -2836,12 +2836,12 @@
     // FIREBASE CONFIG — substitua com suas credenciais
     // ============================================================
     const FIREBASE_CONFIG = {
-      apiKey: "AIzaSyAvOQBLpJQ4RFAMn5mWR_xy_W0xS509G2w",
-      authDomain: "gymflow-23d54.firebaseapp.com",
-      projectId: "gymflow-23d54",
-      storageBucket: "gymflow-23d54.firebasestorage.app",
-      messagingSenderId: "854180858506",
-      appId: "1:854180858506:web:e7fd1906d85bcaad90fb73"
+      apiKey: "__FIREBASE_API_KEY__",
+      authDomain: "__FIREBASE_AUTH_DOMAIN__",
+      projectId: "__FIREBASE_PROJECT_ID__",
+      storageBucket: "__FIREBASE_STORAGE_BUCKET__",
+      messagingSenderId: "__FIREBASE_MESSAGING_SENDER_ID__",
+      appId: "__FIREBASE_APP_ID__"
     };
 
     // ============================================================
@@ -2920,8 +2920,8 @@
     // Crie conta gratuita em cloudinary.com
     // ============================================================
     const APP_VERSION = '1.2.0'; // ← atualize a cada deploy
-    const CLOUDINARY_CLOUD_NAME = 'dkfvnaw7y';   // ex: 'dxyz123'
-    const CLOUDINARY_UPLOAD_PRESET = 'gymflow_posts';  // criar em Settings > Upload > Upload presets (unsigned)
+    const CLOUDINARY_CLOUD_NAME = '__CLOUDINARY_CLOUD_NAME__';
+    const CLOUDINARY_UPLOAD_PRESET = '__CLOUDINARY_UPLOAD_PRESET__';
 
     // Firestore refs
     function refFichas() { return db.collection('users').doc(uid()).collection('fichas'); }
