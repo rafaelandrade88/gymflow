@@ -1,0 +1,14 @@
+[build]
+  command = "mkdir -p dist && sh build.sh"
+  publish = "dist"
+
+[[headers]]
+  for = "/sw.js"
+  [headers.values]
+    Cache-Control = "no-cache"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
