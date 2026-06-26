@@ -2276,6 +2276,9 @@
           </div>
           <div class="field"><label>Senha</label><input type="password" id="loginPass" placeholder="••••••••" /></div>
           <button class="btn btn-primary mt-16" onclick="App.auth.login()">Entrar</button>
+          <div style="text-align:center;margin-top:10px">
+            <button onclick="App.auth.forgotPassword()" style="background:none;border:none;color:var(--text-muted);font-size:13px;cursor:pointer;text-decoration:underline;font-family:var(--font-body)">Esqueci minha senha</button>
+          </div>
           <button onclick="App.auth.googleLogin()" style="
             display:flex; align-items:center; justify-content:center; gap:10px;
             width:100%; margin-top:10px; padding:11px 16px;
@@ -2310,13 +2313,13 @@
               cadastro</button>
           </div>
 
-          <!-- STEP 2: email enviado (estado de aguardo) -->
+          <!-- STEP 2: email enviado — aguardando verificação + finalizar cadastro -->
           <div id="reg-step-2" style="display:none; text-align:center; padding:8px 0">
             <div style="font-size:40px;margin-bottom:12px">📧</div>
             <div style="font-size:15px;font-weight:600;margin-bottom:8px">Verifique seu e-mail</div>
             <p style="font-size:13px;color:var(--text-muted);line-height:1.6;margin-bottom:20px">
               Enviamos um link para <strong id="regEmailSent" style="color:var(--text)">—</strong>.<br>
-              Clique no link, depois volte aqui para informar seu nome e senha.
+              Clique no link no e-mail, depois volte aqui, preencha seu nome e senha e clique em <strong>Finalizar cadastro</strong>.
             </p>
             <div class="field"><label>Nome</label><input type="text" id="regName" placeholder="Seu nome" /></div>
             <div class="field"><label>Senha</label><input type="password" id="regPass"
@@ -2324,6 +2327,8 @@
             <button class="btn btn-primary" onclick="App.auth.completeRegister()">Finalizar cadastro</button>
             <button class="btn btn-ghost mt-8" style="width:100%;font-size:13px"
               onclick="App.auth.resendVerification()">Reenviar e-mail</button>
+            <button class="btn btn-ghost mt-4" style="width:100%;font-size:12px;color:var(--text-muted)"
+              onclick="App.auth.cancelRegister()">Cancelar</button>
           </div>
         </div>
       </div>
@@ -2966,8 +2971,7 @@
           if (!App.auth._validEmail(email)) return toast('E-mail inválido ou não permitido.', 'error');
 
           try {
-            // Cria conta temporária (sem displayName ainda) — Firebase exige conta para enviar verification
-            const pass = App.auth._tempPass(email); // senha temporária determinística
+            const pass = App.auth._tempPass(email);
             let cred;
             try {
               cred = await auth.createUserWithEmailAndPassword(email, pass);
@@ -2978,65 +2982,73 @@
               throw e;
             }
 
-            // Envia e-mail de verificação e desloga (usuário não está autenticado ainda)
-            await cred.user.sendEmailVerification({
-              url: window.location.href // redireciona de volta para o app após verificar
-            });
+            await cred.user.sendEmailVerification({ url: window.location.href });
             await auth.signOut();
 
-            // Mostra step 2
-            $('reg-step-1').style.display = 'none';
-            $('reg-step-2').style.display = 'block';
-            $('regEmailSent').textContent = email;
+            // Persiste email pendente para sobreviver ao reload da página
+            localStorage.setItem('gf_pending_reg', email);
+
+            App.auth._showStep2(email);
             toast('Link enviado! Verifique sua caixa de entrada.', 'success');
           } catch (e) {
             toast(App.auth._msg(e.code), 'error');
           }
         },
 
+        _showStep2(email) {
+          App.auth.tab('register');
+          $('reg-step-1').style.display = 'none';
+          $('reg-step-2').style.display = 'block';
+          $('regEmail').value = email;
+          $('regEmailSent').textContent = email;
+        },
+
+        cancelRegister() {
+          localStorage.removeItem('gf_pending_reg');
+          $('reg-step-1').style.display = 'block';
+          $('reg-step-2').style.display = 'none';
+          $('regEmail').value = '';
+          $('regName').value = '';
+          $('regPass').value = '';
+        },
+
         // STEP 2: usuário clicou no link, volta ao app e finaliza cadastro
         async completeRegister() {
-          const email = $('regEmail').value.trim();
+          const email = $('regEmail').value.trim() || localStorage.getItem('gf_pending_reg') || '';
           const name = $('regName').value.trim();
           const pass = $('regPass').value;
 
+          if (!email) return toast('E-mail não encontrado. Inicie o cadastro novamente.', 'error');
           if (!name) return toast('Informe seu nome.', 'error');
           if (!pass || pass.length < 6) return toast('Senha deve ter ao menos 6 caracteres.', 'error');
 
           const tempPass = App.auth._tempPass(email);
           try {
-            // Faz login com senha temporária
             const cred = await auth.signInWithEmailAndPassword(email, tempPass);
 
-            // Verifica se o e-mail foi confirmado
             await cred.user.reload();
             if (!cred.user.emailVerified) {
               await auth.signOut();
               return toast('E-mail ainda não confirmado. Clique no link que enviamos.', 'error');
             }
 
-            // Atualiza senha definitiva e nome
             await cred.user.updatePassword(pass);
             await cred.user.updateProfile({ displayName: name });
             await auth.signOut();
 
+            localStorage.removeItem('gf_pending_reg');
             toast('Cadastro concluído! Faça login para entrar.', 'success');
-            // Volta para aba de login
             App.auth.tab('login');
             $('loginEmail').value = email;
-            // Reset register form
-            $('reg-step-1').style.display = 'block';
-            $('reg-step-2').style.display = 'none';
-            $('regEmail').value = '';
-            $('regName').value = '';
-            $('regPass').value = '';
+            App.auth.cancelRegister();
           } catch (e) {
             toast(App.auth._msg(e.code), 'error');
           }
         },
 
         async resendVerification() {
-          const email = $('regEmail').value.trim();
+          const email = $('regEmail').value.trim() || localStorage.getItem('gf_pending_reg') || '';
+          if (!email) return toast('E-mail não encontrado. Inicie o cadastro novamente.', 'error');
           const tempPass = App.auth._tempPass(email);
           try {
             const cred = await auth.signInWithEmailAndPassword(email, tempPass);
@@ -3045,6 +3057,18 @@
             toast('Link reenviado! Verifique seu e-mail.', 'success');
           } catch (e) {
             toast('Erro ao reenviar. Tente criar a conta novamente.', 'error');
+          }
+        },
+
+        async forgotPassword() {
+          const email = $('loginEmail').value.trim();
+          if (!email) return toast('Informe seu e-mail no campo acima.', 'error');
+          if (!App.auth._validEmail(email)) return toast('Informe um e-mail válido.', 'error');
+          try {
+            await auth.sendPasswordResetEmail(email);
+            toast('E-mail de redefinição enviado! Verifique sua caixa de entrada.', 'success');
+          } catch (e) {
+            toast(App.auth._msg(e.code), 'error');
           }
         },
 
@@ -4679,6 +4703,12 @@ Extraia TODOS os treinos e exercícios encontrados no PDF.`
         $('screen-auth').classList.add('active');
         $('nav').classList.remove('visible');
         $('splash').style.display = 'none';
+
+        // Detecta cadastro pendente (usuário voltou após clicar no link de verificação)
+        const pendingEmail = localStorage.getItem('gf_pending_reg');
+        if (pendingEmail) {
+          App.auth._showStep2(pendingEmail);
+        }
       }
     });
 
