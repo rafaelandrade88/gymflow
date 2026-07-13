@@ -8,13 +8,33 @@ App PWA single-file para controle de treinos com Firebase, timer de descanso, de
 
 ```
 gymflow/
-├── index.html      ← App completo (HTML + CSS + JS)
-├── sw.js           ← Service Worker (PWA offline)
-├── manifest.json   ← Web App Manifest (instalação)
-├── icon-72.png     ← Ícone PWA (gerar)
-├── icon-192.png    ← Ícone PWA (gerar)
-└── icon-512.png    ← Ícone PWA (gerar)
+├── index.html              ← Markup das telas
+├── vite.config.ts          ← Build + PWA (vite-plugin-pwa gera manifest e SW)
+├── netlify/functions/
+│   └── analyze-pdf.mjs     ← Proxy seguro para a API da Anthropic
+└── src/
+    ├── main.ts             ← Boot, auth listener, registro do SW
+    ├── state.ts            ← Estado global + persistência do treino ativo
+    ├── types.ts            ← Tipos (Ficha, Session, ActiveWorkout...)
+    ├── styles/main.css     ← Design tokens + estilos
+    ├── data/seedFichas.json
+    ├── services/           ← firebase, cloudinary, pdfImport
+    ├── utils/              ← dom (esc/toast), format
+    └── modules/            ← auth, dashboard, fichas, workout, timer,
+                              history, profile, community, sideMenu
 ```
+
+## 🛠 Desenvolvimento
+
+```bash
+npm install
+npm run dev      # localhost:5173
+npm run build    # typecheck + build em dist/
+```
+
+Variáveis de ambiente (`.env` local / Netlify UI):
+- `VITE_FIREBASE_*` e `VITE_CLOUDINARY_*` (ver `.env`)
+- `ANTHROPIC_API_KEY` — **somente no Netlify**, usada pela function `analyze-pdf`
 
 ---
 

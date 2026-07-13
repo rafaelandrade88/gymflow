@@ -1,0 +1,55 @@
+[
+  {
+    "name": "Treino A — Peito e Bíceps",
+    "emoji": "💪",
+    "exercises": [
+      { "name": "Supino inclinado halteres ou máquina", "group": "Peito", "sets": 4, "reps": "6-10", "weight": 0, "obs": "Aquec: 1-2×10-15 | Ajuste: 1-2×4-6 | Trabalho: 1×6-10" },
+      { "name": "Supino reto halteres ou máquina", "group": "Peito", "sets": 3, "reps": "6-10", "weight": 0, "obs": "Ajuste: 1-2×4-6 | Trabalho: 1×6-10 + 2 rest pause 10s na última" },
+      { "name": "Supino declinado barra ou máquina", "group": "Peito", "sets": 2, "reps": "6-10", "weight": 0, "obs": "Ajuste: 1×4-6 | Trabalho: 1×6-10" },
+      { "name": "Voador (2s pico de contração)", "group": "Peito", "sets": 3, "reps": "10-15", "weight": 0, "obs": "Ajuste: 1-2×4-6 | Trabalho: 1×10-15 + 1 drop set" },
+      { "name": "Rosca direta barra livre ou cabo", "group": "Bíceps", "sets": 4, "reps": "6-10", "weight": 0, "obs": "Aquec: 1-2×10-15 | Ajuste: 1-2×4-6 | Trabalho: 1×6-10" },
+      { "name": "Rosca Scott Máquina", "group": "Bíceps", "sets": 3, "reps": "6-10", "weight": 0, "obs": "Ajuste: 1-2×4-6 | Trabalho: 1×6-10 + 2 rest pause 10s na última" },
+      { "name": "Rosca direta corda", "group": "Bíceps", "sets": 2, "reps": "6-10", "weight": 0, "obs": "Ajuste: 1×4-6 | Trabalho: 1×6-10 + 1 drop set" },
+      { "name": "Abdominal supra prancha declinada", "group": "Abdômen", "sets": 3, "reps": "15-20", "weight": 0, "obs": "Intervalo 1 minuto" }
+    ]
+  },
+  {
+    "name": "Treino B — Costas e Panturrilha",
+    "emoji": "🏋️",
+    "exercises": [
+      { "name": "Remada curvada barra (2s contração)", "group": "Costas", "sets": 4, "reps": "6-10", "weight": 0, "obs": "Aquec: 1-2×10-15 | Ajuste: 1-2×4-6 | Trabalho: 1×6-10" },
+      { "name": "Remada baixa triângulo (2s contração)", "group": "Costas", "sets": 3, "reps": "6-10", "weight": 0, "obs": "Ajuste: 1-2×4-6 | Trabalho: 1×6-10 + 2 rest pause 10s" },
+      { "name": "Remada baixa pegada aberta ou máquina (2s contr)", "group": "Costas", "sets": 2, "reps": "6-10", "weight": 0, "obs": "Ajuste: 1×4-6 | Trabalho: 1×6-10" },
+      { "name": "Pulley frente triângulo (2s contração)", "group": "Costas", "sets": 3, "reps": "6-10", "weight": 0, "obs": "Ajuste: 1-2×4-6 | Trabalho: 1×6-10 + 1 drop set" },
+      { "name": "Meio Terra", "group": "Costas", "sets": 4, "reps": "6-10", "weight": 0, "obs": "Aquec: 1×10-15 | Ajuste: 1-2×4-6 | Trabalho: 1×6-10" },
+      { "name": "Panturrilha máquina ou em pé no smith", "group": "Perna", "sets": 3, "reps": "10-15", "weight": 0, "obs": "Aquec: 1×10-15 | Ajuste: 1-2×4-6" }
+    ]
+  },
+  {
+    "name": "Treino C — Ombro e Tríceps",
+    "emoji": "⚡",
+    "exercises": [
+      { "name": "Desenvolvimento halteres ou máquina", "group": "Ombro", "sets": 4, "reps": "6-10", "weight": 0, "obs": "Aquec: 1-2×10-15 | Ajuste: 1-2×4-6 | Trabalho: 1×6-10" },
+      { "name": "Elevação frontal corda ou halteres", "group": "Ombro", "sets": 3, "reps": "6-10", "weight": 0, "obs": "Ajuste: 1-2×4-6 | Trabalho: 1×6-10 + 2 rest pause 10s" },
+      { "name": "Elevação lateral", "group": "Ombro", "sets": 2, "reps": "6-10", "weight": 0, "obs": "Ajuste: 1×4-6 | Trabalho: 1×6-10" },
+      { "name": "Elevação unilateral cabo", "group": "Ombro", "sets": 3, "reps": "10-15", "weight": 0, "obs": "Ajuste: 1-2×4-6 | Trabalho: 1×10-15 + 1 drop set" },
+      { "name": "Tríceps testa corda", "group": "Tríceps", "sets": 4, "reps": "6-10", "weight": 0, "obs": "Aquec: 1-2×10-15 | Ajuste: 1-2×4-6 | Trabalho: 1×6-10" },
+      { "name": "Tríceps corda", "group": "Tríceps", "sets": 3, "reps": "6-10", "weight": 0, "obs": "Ajuste: 1-2×4-6 | Trabalho: 1×6-10 + 2 rest pause 10s na última" },
+      { "name": "Tríceps francês", "group": "Tríceps", "sets": 2, "reps": "6-10", "weight": 0, "obs": "Ajuste: 1×4-6 | Trabalho: 1×6-10 + 1 drop set" },
+      { "name": "Abdominal infra torre", "group": "Abdômen", "sets": 3, "reps": "15-20", "weight": 0, "obs": "Intervalo 1 minuto" }
+    ]
+  },
+  {
+    "name": "Treino D — Perna",
+    "emoji": "🦵",
+    "exercises": [
+      { "name": "Panturrilha sentada", "group": "Perna", "sets": 5, "reps": "6-10", "weight": 0, "obs": "Aquec: 1×10-15 | Ajuste: 1-2×4-6 | Trabalho: 3×6-10" },
+      { "name": "Agachamento livre", "group": "Perna", "sets": 4, "reps": "6-10", "weight": 0, "obs": "Aquec: 1-2×10-15 | Ajuste: 1-2×4-6 | Trabalho: 1×6-10" },
+      { "name": "Leg 45", "group": "Perna", "sets": 4, "reps": "6-10", "weight": 0, "obs": "Aquec: 1×10-15 | Ajuste: 1-2×4-6 | Trabalho: 1×6-10 + 2 rest pause 10s" },
+      { "name": "Extensor", "group": "Perna", "sets": 3, "reps": "6-10", "weight": 0, "obs": "Ajuste: 1-2×4-6 | Trabalho: 1×6-10 + drop set" },
+      { "name": "Flexor deitado (2s contração)", "group": "Perna", "sets": 4, "reps": "6-10", "weight": 0, "obs": "Aquec: 1×10-15 | Ajuste: 1-2×4-6 | Trabalho: 1×6-10 + 2 rest pause 10s" },
+      { "name": "Stiff", "group": "Glúteo", "sets": 4, "reps": "6-10", "weight": 0, "obs": "Aquec: 1×10-15 | Ajuste: 1-2×4-6 | Trabalho: 1×6-10" },
+      { "name": "Elevação de quadril (2s contração)", "group": "Glúteo", "sets": 4, "reps": "6-10", "weight": 0, "obs": "Aquec: 1×10-15 | Ajuste: 1-2×4-6 | Trabalho: 1×6-10" }
+    ]
+  }
+]
