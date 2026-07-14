@@ -510,7 +510,7 @@
       <div id="pdfStep1">
         <input type="file" id="pdfFileInput" accept="application/pdf" style="display:none"
           onchange="App.fichas.pdfSelected(this)" />
-        <div class="pdf-upload-area" id="pdfUploadArea" onclick="$('pdfFileInput').click()">
+        <div class="pdf-upload-area" id="pdfUploadArea" onclick="document.getElementById('pdfFileInput').click()">
           <div class="pdf-icon">📎</div>
           <div style="font-size:14px;font-weight:600">Toque para selecionar o PDF</div>
           <div class="pdf-status" id="pdfStatus">Máximo 10MB</div>
