@@ -171,7 +171,7 @@ export const fichas = {
   pdfSelected(input: HTMLInputElement): void {
     const file = input.files?.[0];
     if (!file) return;
-    if (file.size > 10 * 1024 * 1024) return toast('PDF muito grande. Máximo 10MB.', 'error');
+    if (file.size > 50 * 1024 * 1024) return toast('PDF muito grande. Máximo 50MB.', 'error');
     if (file.type !== 'application/pdf') return toast('Selecione um arquivo PDF.', 'error');
     pdfFile = file;
     $('pdfUploadArea').classList.add('has-file');

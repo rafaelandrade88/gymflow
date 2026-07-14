@@ -35,7 +35,7 @@ export default async (req) => {
   } catch {
     return Response.json({ error: 'Corpo da requisição inválido.' }, { status: 400 });
   }
-  if (!pdfBase64 || typeof pdfBase64 !== 'string' || pdfBase64.length > 15_000_000) {
+  if (!pdfBase64 || typeof pdfBase64 !== 'string' || pdfBase64.length > 70_000_000) {
     return Response.json({ error: 'PDF ausente ou muito grande.' }, { status: 400 });
   }
 
