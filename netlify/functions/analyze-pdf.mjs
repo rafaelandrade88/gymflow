@@ -39,7 +39,9 @@ export default async (req) => {
     return Response.json({ error: 'PDF ausente ou muito grande.' }, { status: 400 });
   }
 
-  const response = await fetch('https://api.anthropic.com/v1/messages', {
+  let response;
+  try {
+    response = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -57,10 +59,15 @@ export default async (req) => {
         ]
       }]
     })
-  });
+    });
+  } catch (e) {
+    console.error('[analyze-pdf] fetch falhou:', e);
+    return Response.json({ error: `Falha ao chamar a API da Anthropic: ${e.message}` }, { status: 502 });
+  }
 
   if (!response.ok) {
     const err = await response.json().catch(() => ({}));
+    console.error('[analyze-pdf] API respondeu', response.status, JSON.stringify(err));
     return Response.json(
       { error: err.error?.message || `Erro na API: ${response.status}` },
       { status: 502 }
@@ -68,7 +75,7 @@ export default async (req) => {
   }
 
   const data = await response.json();
-  const rawText = data.content.filter(b => b.type === 'text').map(b => b.text).join('');
+  const rawText = (data.content || []).filter(b => b.type === 'text').map(b => b.text).join('');
   try {
     const parsed = JSON.parse(rawText.replace(/```json|```/g, '').trim());
     return Response.json({ fichas: parsed.fichas || [] });
